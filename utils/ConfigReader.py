@@ -12,7 +12,7 @@ class ConfigReader:
         return cls._instance
 
     def _load_config(self):
-        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"config.json")
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Конфигурационный файл не найден: {config_path}")
 
@@ -24,5 +24,3 @@ class ConfigReader:
 
     def __del__(self):
         ConfigReader.__instance = None
-
-

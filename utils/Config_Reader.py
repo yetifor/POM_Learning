@@ -9,6 +9,8 @@ class ConfigReader:
         if cls._instance is None:
             cls._instance = object.__new__(cls)
             cls._instance._load_config()
+
+
         return cls._instance
 
     def _load_config(self):

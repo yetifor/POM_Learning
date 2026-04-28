@@ -1,30 +1,36 @@
-from pages.Main_Page import MainPage
-from pages.Search_Page import SearchPage
+from pages.main_page import MainPage
+from pages.search_page import SearchPage
 from utils.enums import Sorting
 
 import pytest
-from utils.Config_Reader import ConfigReader
+from utils.config_reader import ConfigReader
 
 config = ConfigReader()
 
 
-@pytest.mark.parametrize('category, states_count, type_filter', [
-    ('city', 10, Sorting.LOW_TO_HIGH),
-    ('city', 15, Sorting.HIGH_TO_LOW),
-    ('habits', 10, Sorting.LOW_TO_HIGH),
-    ('habits', 15, Sorting.HIGH_TO_LOW)
-])
+@pytest.mark.parametrize('category', ['city', 'habits'])
+@pytest.mark.parametrize('states_count', [10, 15])
+@pytest.mark.parametrize('type_filter', [Sorting.LOW_TO_HIGH, Sorting.HIGH_TO_LOW])
 def test_sorted1(page, category, states_count, type_filter):
     main_page = MainPage(page)
     search_page = SearchPage(page)
     main_page.page.goto(config.get('url'))
     main_page.search(category)
     search_page.pick_filter(type_filter)
-    search_page.page.wait_for_timeout(5000)
-    res = search_page.get_all_prices(states_count)
-    print(res)
     if type_filter == Sorting.LOW_TO_HIGH:
-        assert res == sorted(res), 'цены не отсортированы по возрастанию'
-    elif type_filter == Sorting.HIGH_TO_LOW:
-        assert res == sorted(res, reverse=True), 'цены не отсортированы по убыванию'
+        search_page.page.wait_for_url('**sort=price_asc**')
+        res = search_page.get_all_prices(states_count)
+        print(res)
+        assert res == sorted(res), (f'Получен резуьтат: actual = {res} '
+                                    f'Фильтр сорировки:{type_filter}'
+                                    f'Кол-во объектов: {states_count}'
+                                    f'Ожидался результат: expected result = {sorted(res)}')
 
+    elif type_filter == Sorting.HIGH_TO_LOW:
+        search_page.page.wait_for_url('**sort=price_desc**')
+        res = search_page.get_all_prices(states_count)
+        print(res)
+        assert res == sorted(res, reverse=True), (f'Получен резуьтат: actual = {res}'
+                                                  f'Фильтр сорировки:{type_filter}'
+                                                  f'Кол-во объектов: {states_count}'
+                                                  f'Ожидался результат: expected result = {sorted(res, reverse=True)}')

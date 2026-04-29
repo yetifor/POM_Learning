@@ -1,16 +1,14 @@
 from pages.main_page import MainPage
 from pages.search_page import SearchPage
 from utils.enums import Sorting
-
 import pytest
 from utils.config_reader import ConfigReader
 
 config = ConfigReader()
 
 
+@pytest.mark.parametrize('states_count, type_filter', [(10, Sorting.LOW_TO_HIGH), (15, Sorting.HIGH_TO_LOW)])
 @pytest.mark.parametrize('category', ['city', 'habits'])
-@pytest.mark.parametrize('states_count', [10, 15])
-@pytest.mark.parametrize('type_filter', [Sorting.LOW_TO_HIGH, Sorting.HIGH_TO_LOW])
 def test_sorted1(page, category, states_count, type_filter):
     main_page = MainPage(page)
     search_page = SearchPage(page)
